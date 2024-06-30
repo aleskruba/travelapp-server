@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prestart": "prisma generate",
+    "prestart": "npx prisma generate",
     "start": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.16.0",
+    "@prisma/client": "^5.16.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "connect-redis": "^7.1.1",
@@ -23,5 +23,8 @@
     "ioredis": "^5.4.1",
     "nodemon": "^3.1.4",
     "redis-cli": "^2.1.2"
+  },
+  "devDependencies": {
+    "prisma": "^5.16.1"
   }
 }
