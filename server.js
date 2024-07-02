@@ -9,7 +9,7 @@ const authRoutes = require('./routes/authRoutes');
 
 dotenv.config();
 
-console.log(`Connecting to Redis at 127.0.0.1:6379`);
+//console.log(`Connecting to Redis at 127.0.0.1:6379`);
 
 app.use(express.json());
 app.use(cookieParser());
