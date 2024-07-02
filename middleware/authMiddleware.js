@@ -3,9 +3,9 @@ const dotenv = require('dotenv');
 const redis = require('redis');
 const { promisify } = require('util');
 
-const redisClient = redis.createClient({
+let redisClient = redis.createClient({
     //host: '127.0.0.1',
-    host: process.env.REDIS_URL_PRODUCTION ,
+    host: process.env.REDIS_URL ,
     port: 6379,
 });
 
