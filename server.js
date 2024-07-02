@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 
 
 const corsOptions = {
-  origin: [process.env.DEV_CORS_ORIGIN , 'http://localhost:3000'],
+  origin: [ 'http://localhost:3000','https://travelapp-server.onrender.com'],
   credentials: true,
 };
 
