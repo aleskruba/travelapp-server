@@ -4,9 +4,18 @@ const redis = require('redis');
 const { promisify } = require('util');
 
 const redisClient = redis.createClient({
-    host: '127.0.0.1',
+    //host: '127.0.0.1',
+    host: process.env.NODE_ENV ,
     port: 6379,
 });
+
+
+
+if (process.env.NODE_ENV === 'production') {
+    redisClient = redis.createClient(process.env.REDIS_URL);
+} else {
+    redisClient = redis.createClient(process.env.REDIS_URL_DEVELOPMENT);
+}
 
 redisClient.on('error', (err) => {
     console.error('Redis error:', err);
