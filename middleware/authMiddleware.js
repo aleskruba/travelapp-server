@@ -1,11 +1,13 @@
 
-const dotenv = require('dotenv');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+const crypto = require('crypto');
 const redis = require('redis');
 const { promisify } = require('util');
 
 let redisClient = redis.createClient({
     //host: '127.0.0.1',
-    host: 'red-cq0mg1iju9rs73avmd4g',
+    host: process.env.REDIS_URL,
     port: 6379,
 });
 
@@ -73,4 +75,40 @@ const checkAlreadyLoggedIn = async (req, res, next) => {
     }
 };
 
-module.exports = {verifySession,checkAlreadyLoggedIn};
+
+async function verifyUser(req, res, next) {
+    const { email } = req.body;
+    try {
+        const existingUser = await prisma.user.findUnique({
+            where: { email: email }
+        });
+
+        if (existingUser) {
+           
+            const resetToken = crypto.randomBytes(20).toString('hex');
+            const reset_token_hash	 = crypto.createHash("sha256").update(resetToken).digest('hex');
+           
+            const reset_token_expires_at = Date.now() + 3600000;
+
+            existingUser.reset_token_hash = reset_token_hash
+            existingUser.reset_token_expires_at = reset_token_expires_at
+
+            const resetUrl =` http://localhost:3000/resetpassword?token=${resetToken}`
+
+            req.reset_token_hash = reset_token_hash;
+            req.reset_token_expires_at = reset_token_expires_at;
+            req.resetUrl = resetUrl;
+            req.email = email;
+            next();
+        } else {
+            console.log('User not found in the database');
+            return res.status(404).send({ error: "Email nenalezen" });
+        }
+    } catch (error) {
+        console.error('Authentication Error:', error);
+        return res.status(500).send({ error: "Authentication Error" });
+    }
+}
+
+
+module.exports = {verifySession,checkAlreadyLoggedIn,verifyUser};
