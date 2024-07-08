@@ -7,8 +7,9 @@ const { promisify } = require('util');
 
 let redisClient = redis.createClient({
     //host: '127.0.0.1',
-    host: process.env.REDIS_URL,
-    port: 6379,
+  //  host: process.env.REDIS_URL,
+  host:'redis://red-cq0mg1iju9rs73avmd4g', 
+  port: 6379,
 });
 
 
