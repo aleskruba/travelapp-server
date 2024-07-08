@@ -9,8 +9,8 @@ const crypto = require('crypto');
 
 let redisClient = redis.createClient({
         //host: '127.0.0.1',
-     host: process.env.REDIS_URL ,
-   // host:'red-cq0mg1iju9rs73avmd4g',
+    // host: process.env.REDIS_URL ,
+    host:'red-cq0mg1iju9rs73avmd4g',
     port: 6379,
 
 });
