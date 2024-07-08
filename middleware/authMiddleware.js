@@ -14,12 +14,6 @@ let redisClient = redis.createClient({
 
 
 
-if (process.env.NODE_ENV === 'production') {
-    redisClient = redis.createClient(process.env.REDIS_URL);
-} else {
-    redisClient = redis.createClient(process.env.REDIS_URL_DEVELOPMENT);
-}
-
 redisClient.on('error', (err) => {
     console.error('Redis error:', err);
 });
