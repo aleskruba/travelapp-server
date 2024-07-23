@@ -8,8 +8,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 let redisClient = redis.createClient({
-        //host: '127.0.0.1',
-    // host: process.env.REDIS_URL ,
+    //host: '127.0.0.1',
     host:'red-cq0mg1iju9rs73avmd4g',
     port: 6379,
 
@@ -18,6 +17,7 @@ let redisClient = redis.createClient({
 
 const setAsync = promisify(redisClient.set).bind(redisClient);
 const delAsync = promisify(redisClient.del).bind(redisClient);
+const getAsync = promisify(redisClient.get).bind(redisClient);
 
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
@@ -31,6 +31,8 @@ module.exports.checkSession = (req, res, next) => {
         email: user.email,
         image: user.image
     };
+
+    console.log('userData',userData);
         return res.status(200).json({user: userData} );
     } catch (err) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -323,8 +325,7 @@ module.exports.sendEmail = async (req, res) => {
     const reset_token_hash = req.reset_token_hash;
     const reset_token_expires_at = req.reset_token_expires_at;
 
-    console.log('token', reset_token_hash);
-    console.log('expires_at', reset_token_expires_at);
+
 
     try {
         let transporter = nodemailer.createTransport({
@@ -350,7 +351,7 @@ module.exports.sendEmail = async (req, res) => {
                 console.log(error);
                 return res.status(500).json({ error: 'Email sending failed' });
             } else {
-                console.log('Email sent:', info.response);
+  
                 try {
                     await prisma.user.update({
                         where: { email: email },
@@ -361,7 +362,8 @@ module.exports.sendEmail = async (req, res) => {
                     });
                     res.status(201).json({ message: 'Email sent successfully!' });
                 } catch (e) {
-                    console.log(e);
+      
+                    
                     res.status(500).json({ error: 'Failed to update user data' });
                 }
             }
@@ -443,10 +445,10 @@ module.exports.resetPassword = async (req, res) => {
             }
         });
 
-        const sessionId = uuidv4();
+    //    const sessionId = uuidv4();
 
         // Store the session ID in Redis with an expiration time
-        await setAsync(`session:${sessionId}`, JSON.stringify(updatedUser), 'EX', 86400); // Expire in 1 day (86400 seconds)
+/*         await setAsync(`session:${sessionId}`, JSON.stringify(updatedUser), 'EX', 86400); // Expire in 1 day (86400 seconds)
 
         res.cookie('sessionID', sessionId, {
             httpOnly: true,
@@ -458,11 +460,11 @@ module.exports.resetPassword = async (req, res) => {
         const userData = {
             id: updatedUser.id,
             email: updatedUser.email
-        };
+        }; */
 
         res.status(200).json({
             message: 'Heslo bylo úspěšně resetováno',
-            user: userData
+            user: updatedUser
         });
 
     } catch (err) {
@@ -473,3 +475,163 @@ module.exports.resetPassword = async (req, res) => {
         await prisma.$disconnect();
     }
 };
+
+
+
+module.exports.uploadprofileimage = async (req, res, next) => {
+    const user =req.user
+    const userId = user.id
+
+    const base64String = req.body.image; // Accessing the base64 string from req.body
+
+    try {
+
+
+         const cloudinaryUrl = process.env.PUBLIC_CLOUDINARY_URL;
+
+        if (!cloudinaryUrl) {
+            console.error("Cloudinary URL is not defined!");
+            return res.status(500).json({ error: 'Cloudinary URL is not defined' });
+        }
+
+        if (!base64String) {
+            console.error('No image selected for upload');
+            return res.status(400).json({ error: 'No image selected for upload' });
+        }
+
+        const cloudinaryUploadResponse = await fetch(cloudinaryUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                file: base64String,
+                upload_preset: 'schoolapp'
+            })
+        });
+        
+        const cloudinaryResponseData = await cloudinaryUploadResponse.json();
+        const imageUrl = cloudinaryResponseData.secure_url;
+
+        try {
+            const resp = await prisma.user.update({
+                where: {
+                    id: userId
+                },
+                data: {
+                    image: imageUrl
+                }
+            });
+        
+            const sessionId = req.cookies.sessionID;
+            if (!sessionId) {
+                return res.status(400).json({ error: 'No session ID found' });
+            }
+    
+            // Update session data in Redis
+            const sessionData = await getAsync(`session:${sessionId}`);
+            if (!sessionData) {
+                return res.status(400).json({ error: 'Session not found' });
+            }
+            
+            const session = JSON.parse(sessionData);
+            session.image = imageUrl;
+            await setAsync(`session:${sessionId}`, JSON.stringify(session));
+
+        } catch (error) {
+            console.error('Error during uploading image:', error);
+        }
+
+
+        res.status(201).json({ imageUrl      });
+    } catch (error) {
+        console.error('Error during uploading image:', error);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+
+
+module.exports.updateprofile = async (req, res, next) => {
+    const sessionUser = req.user;
+    const userId = sessionUser.id;
+    const { username, firstName, lastName, email } = req.body;
+
+    try {
+        // Update user profile in the database
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: {
+                username,
+                firstName,
+                lastName,
+                email,
+            },
+        });
+
+    
+        const sessionId = req.cookies.sessionID;
+        if (!sessionId) {
+            return res.status(400).json({ error: 'No session ID found' });
+        }
+
+        // Update session data in Redis
+        const sessionData = await getAsync(`session:${sessionId}`);
+        if (!sessionData) {
+            return res.status(400).json({ error: 'Session not found' });
+        }
+        
+        const session = JSON.parse(sessionData);
+        console.log('session',session)
+          session.username = username;
+          session.firstName = firstName;
+          session.lastName = lastName;
+          session.email = email;
+        await setAsync(`session:${sessionId}`, JSON.stringify(session));
+
+        res.status(201).json({ updatedUser });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+
+
+
+module.exports.updatePassword = async (req, res, next) => {
+    const sessionUser = req.user;
+    const userId = sessionUser.id;
+    const { password, confirmPassword } = req.body;
+
+    console.log(password, confirmPassword )
+    if (password !== confirmPassword) {
+        return res.status(401).json({ error: 'Hesla nejsou stejná ' });
+    }
+
+    if (password.trim().length < 8 || password.trim().length > 50) {
+        return res.status(400).json({ error: 'Heslo musí mít 8 až 50 znaků' });
+    }
+
+    try {
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const passwordUpdatedAt = new Date();
+
+        // Update the user's password and the timestamp in the database
+        await prisma.user.update({
+            where: { id: userId },
+            data: {
+                password: hashedPassword,
+                passwordUpdatedAt: passwordUpdatedAt,
+            },
+        });
+
+
+        return res.status(201).json({ message: "ok" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+

@@ -23,6 +23,7 @@ model user {
   googleProfilePicture   String?       @db.VarChar(255)
   reset_token_hash       String?       @db.VarChar(64)
   reset_token_expires_at DateTime?     @db.DateTime(0)
+  passwordUpdatedAt      DateTime?     @db.DateTime(0) 
   message                message[]
   reply                  reply[]
   tour                   tour[]

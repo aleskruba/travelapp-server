@@ -15,6 +15,9 @@ router.get('/api/logout',verifySession, authController.logout);
 router.post('/api/sendemail',verifyUser,authController.sendEmail);
 router.post('/api/verifytoken', authController.verifyToken);
 router.put('/api/resetpassword', authController.resetPassword);
+router.put('/api/uploadprofileimage',verifySession,authController.uploadprofileimage);
+router.put('/api/updateprofile',verifySession,authController.updateprofile)
+router.put('/api/updatepassword',verifySession,authController.updatePassword)
 
 
 
