@@ -8,7 +8,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 
 let redisClient = redis.createClient({
-    //host: '127.0.0.1',
+ //   host: '127.0.0.1',
     host:'red-cq0mg1iju9rs73avmd4g',
     port: 6379,
 
@@ -32,7 +32,7 @@ module.exports.checkSession = (req, res, next) => {
         image: user.image
     };
 
-    console.log('userData',userData);
+
         return res.status(200).json({user: userData} );
     } catch (err) {
         return res.status(401).json({ error: 'Unauthorized' });
@@ -42,6 +42,7 @@ module.exports.checkSession = (req, res, next) => {
 
 module.exports.getUsers = async (req, res) => {
 
+    try {
 
     async function main() {
 
@@ -57,7 +58,13 @@ module.exports.getUsers = async (req, res) => {
           await prisma.$disconnect();
         });
 
-}
+    }
+        catch(e) {
+            console.error(e);
+        }
+    
+    }
+
 
 module.exports.signup_post = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
@@ -603,6 +610,8 @@ module.exports.updatePassword = async (req, res, next) => {
     const sessionUser = req.user;
     const userId = sessionUser.id;
     const { password, confirmPassword } = req.body;
+
+    console.log('password, confirmPassword ',password, confirmPassword )
 
     console.log(password, confirmPassword )
     if (password !== confirmPassword) {

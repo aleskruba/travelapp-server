@@ -5,7 +5,7 @@ const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
-
+const messageRoutes = require('./routes/messageRoutes');
 
 dotenv.config();
 
@@ -24,7 +24,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(authRoutes);
+app.use(authRoutes,messageRoutes);
 
 
 
