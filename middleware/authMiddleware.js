@@ -2,14 +2,17 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const crypto = require('crypto');
-const redis = require('redis');
+//const redis = require('redis');
 const { promisify } = require('util');
+const { redisClient } = require('../redis.js')
 
-let redisClient = redis.createClient({
-   //host: '127.0.0.1',
-  host:'red-cq0mg1iju9rs73avmd4g', 
+
+
+/* let redisClient = redis.createClient({
+  host: '127.0.0.1',
+  //host:'red-cq0mg1iju9rs73avmd4g', 
   port: 6379,
-});
+}); */
 
 
 

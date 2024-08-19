@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const vlogRoutes = require('./routes/vlogRoutes');
 
+
 dotenv.config();
 
 //console.log(`Connecting to Redis at 127.0.0.1:6379`);
@@ -26,7 +27,6 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(authRoutes,messageRoutes,vlogRoutes);
-
 
 
 

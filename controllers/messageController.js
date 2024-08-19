@@ -1,15 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
-const { promisify } = require('util');
-const redis = require('redis');
-
-
-let redisClient = redis.createClient({
-  //  host: '127.0.0.1',
-    host:'red-cq0mg1iju9rs73avmd4g',
-    port: 6379,
-
-});
 
 
 module.exports.getMessages = async (req, res) => {
