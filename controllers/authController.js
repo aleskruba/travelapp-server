@@ -3,18 +3,9 @@ const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const { promisify } = require('util');
-//const redis = require('redis');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const { redisClient } = require('../redis.js')
-
-/* let redisClient = redis.createClient({
-    host: '127.0.0.1',
- //   host:'red-cq0mg1iju9rs73avmd4g',
-    port: 6379,
-
-}); */
-
 
 
 const setAsync = promisify(redisClient.set).bind(redisClient);

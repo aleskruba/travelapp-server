@@ -191,7 +191,7 @@ module.exports.updateVlog = async (req, res) => {
 
 module.exports.getYourVlogs = async (req, res) => {
   const page = parseInt(req.query.page) ; 
-  const limit = 6; 
+  const limit = 8; 
   const offset = (page - 1) * limit;  
   const user = req.user;
   const userId = user.id;
