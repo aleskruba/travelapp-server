@@ -487,7 +487,7 @@ module.exports.uploadprofileimage = async (req, res, next) => {
     try {
 
 
-         const cloudinaryUrl = process.env.PUBLIC_CLOUDINARY_URL;
+         const cloudinaryUrl = 'https://api.cloudinary.com/v1_1/dzxwsgl1r/image/upload';
          console.log(cloudinaryUrl);
 
         if (!cloudinaryUrl) {
