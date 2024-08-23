@@ -488,6 +488,7 @@ module.exports.uploadprofileimage = async (req, res, next) => {
 
 
          const cloudinaryUrl = process.env.PUBLIC_CLOUDINARY_URL;
+         console.log(cloudinaryUrl);
 
         if (!cloudinaryUrl) {
             console.error("Cloudinary URL is not defined!");
