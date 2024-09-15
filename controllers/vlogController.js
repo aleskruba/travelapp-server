@@ -138,7 +138,6 @@ module.exports.updateVlog = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
-  console.log(id, vlog);
 
   try {
     // Ensure vlog exists and is valid

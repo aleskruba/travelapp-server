@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const authRoutes = require('./routes/authRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const vlogRoutes = require('./routes/vlogRoutes');
+const tourRoutes = require('./routes/tourRoutes');
 
 
 dotenv.config();
@@ -25,7 +26,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(authRoutes,messageRoutes,vlogRoutes);
+app.use(authRoutes,messageRoutes,vlogRoutes,tourRoutes);
 
 
 

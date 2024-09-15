@@ -4,11 +4,13 @@ const prisma = new PrismaClient();
 
 module.exports.getMessages = async (req, res) => {
   const countryId = req.params.id;
+
   const page = parseInt(req.query.page) ;  // Get the page number from query parameters, default to 1
-  const limit = 8;  // Number of items per page
+  const limit = 4;  // Number of items per page
   const offset = (page - 1) * limit;  // Calculate the offset
 
-  console.log('page',page);
+
+
   try {
       const messages = await prisma.message.findMany({
           where: {
@@ -42,11 +44,11 @@ module.exports.getMessages = async (req, res) => {
       });
       
       const totalPages = Math.ceil(totalMessages / limit);
-      console.log(messages.length , ' totalPages:',totalPages, 'currentPage:',page )
+    //  console.log(messages.length , ' totalPages:',totalPages, 'currentPage:',page )
       res.status(200).json({
           messages,
           totalPages,
-          currentPage: page
+       /*    currentPage: page */
       });
   } catch (err) {
       console.error(err);
