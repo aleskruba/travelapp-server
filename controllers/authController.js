@@ -22,6 +22,7 @@ module.exports.checkSession = (req, res, next) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        googleEmail: user.googleEmail,
         image: user.image
     };
 
@@ -212,6 +213,7 @@ module.exports.login_post = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            googleEmail: user.googleEmail,
             image: user.image
         };
 
@@ -263,6 +265,7 @@ module.exports.googleLogin_post = async (req, res) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            googleEmail: user.googleEmail,
             image: user.image
         };
 
