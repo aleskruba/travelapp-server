@@ -178,3 +178,108 @@ module.exports.getTours = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+module.exports.getYourTours = async (req, res) => {
+  const user = req.user;
+  const userId = user.id;
+  
+  try {
+
+
+    const yourtours = await prisma.tour.findMany({
+      where: {
+          user_id: userId
+      },
+      include: {
+          user: true, 
+      
+      },
+           orderBy: {
+          id: 'desc'  
+      }
+  });;
+
+    res.status(201).json({ yourtours });
+
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ error: 'Chyba server neodpovidá' });
+  }
+}
+
+module.exports.postTour = async (req, res) => {
+  const data = req.body;
+  const user = req.user;
+  const userId = user.id;
+
+  
+  try {
+    const hasCompleted = !data.tour.destination || data.tour.tourtype.length === 0 || !data.tour.fellowtraveler || !data.tour.aboutme || !data.tour.tourdate || !data.tour.tourdateEnd;
+
+    if (hasCompleted) {
+      return res.status(403).json({ error: 'Nejsou vyplňena všechna pole' });
+    }
+
+    // Convert the tourdate and tourdateEnd to 'YYYY-MM-DD' format
+    const formattedTourdate = new Date(data.tour.tourdate).toISOString().slice(0, 10); // '2024-08-31'
+    const formattedTourdateEnd = new Date(data.tour.tourdateEnd).toISOString().slice(0, 10); // '2024-08-31'
+
+    // Convert back to valid Date object
+    const tourdate = new Date(`${formattedTourdate}T00:00:00.000Z`);
+    const tourdateEnd = new Date(`${formattedTourdateEnd}T00:00:00.000Z`);
+
+    // Create new tour in the database using Prisma
+    const newTour = await prisma.tour.create({
+      data: {
+        destination: data.tour.destination,
+        tourdate,       // Date object
+        tourdateEnd,    // Date object
+        fellowtraveler: data.tour.fellowtraveler,
+        aboutme: data.tour.aboutme,
+        user_id: userId,
+        tourtype: JSON.stringify(data.tour.tourtype), // Convert tourtype array to string
+      },
+    });
+
+    res.status(201).json({ message: newTour });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Chyba server neodpovidá' });
+  }
+};
+
+module.exports.deleteTour = async (req, res) => {
+  const { id } = req.params;
+  const user = req.user;
+  const userId = user.id;
+
+
+  try {
+    const tour = await prisma.tour.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    if (!tour) {
+      return res.status(404).json({ error: 'Tour not found' });
+    }
+
+    if (tour.user_id !== userId) {
+      return res.status(403).json({ error: 'You are not authorized to delete this tour' });
+    }
+
+    await prisma.tour.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+
+    res.status(201).json({ message: 'Tour was deleted' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+

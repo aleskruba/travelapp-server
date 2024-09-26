@@ -123,7 +123,7 @@ module.exports.deleteVlog = async (req, res) => {
       },
     });
 
-    res.status(201).json({ message: 'Message was deleted' });
+    res.status(201).json({ message: 'Vlog was deleted' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Server error' });
