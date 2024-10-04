@@ -40,7 +40,7 @@ module.exports.getTours = async (req, res) => {
   
   const search = req.query.search || '';
   const page = parseInt(req.query.page) || 1;
-  const limit = 4;
+  const limit = 8;
   const offset = (page - 1) * limit;
   
   const normalizedSearch = removeAccents(search).toLowerCase();
@@ -249,6 +249,66 @@ module.exports.postTour = async (req, res) => {
   }
 };
 
+module.exports.updateTour = async (req, res) => {
+  const { id } = req.params;
+  const data = req.body;
+  const user = req.user;
+  const userId = user.id;
+
+  try {
+    // Find the existing tour by its ID
+    const existingTour = await prisma.tour.findUnique({
+      where: { id: parseInt( id) },
+    });
+
+    if (!existingTour) {
+      return res.status(404).json({ error: 'Tour not found' });
+    }
+
+    // Validate required fields
+    const hasCompleted =
+      !data.tour.destination ||
+      !data.tour.fellowtraveler ||
+      !data.tour.aboutme ||
+      !data.tour.tourdate ||
+      !data.tour.tourdateEnd ||
+      data.tour.tourtype.length === 0;
+
+    if (hasCompleted) {
+      return res.status(403).json({ error: 'Nejsou vyplňena všechna pole' });
+    }
+
+    // Convert tourdate and tourdateEnd to 'YYYY-MM-DD' format
+    const formattedTourdate = new Date(data.tour.tourdate).toISOString().slice(0, 10); // 'YYYY-MM-DD'
+    const formattedTourdateEnd = new Date(data.tour.tourdateEnd).toISOString().slice(0, 10); // 'YYYY-MM-DD'
+
+    // Convert to Date objects for Prisma
+    const tourdate = new Date(`${formattedTourdate}T00:00:00.000Z`);
+    const tourdateEnd = new Date(`${formattedTourdateEnd}T00:00:00.000Z`);
+
+    // Update the tour in the database using Prisma
+    const updatedTour = await prisma.tour.update({
+      where: { id: parseInt(data.tour.id) }, // Specify the tour to update
+      data: {
+        destination: data.tour.destination,
+        tourdate, // Date object
+        tourdateEnd, // Date object
+        fellowtraveler: data.tour.fellowtraveler,
+        aboutme: data.tour.aboutme,
+        user_id: userId,
+        tourtype: JSON.stringify(data.tour.tourtype), // Convert tourtype array to string
+      },
+    });
+
+    // Respond with the updated tour
+    res.status(200).json({ message: 'Tour successfully updated', updatedTour });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+
 module.exports.deleteTour = async (req, res) => {
   const { id } = req.params;
   const user = req.user;
@@ -283,3 +343,30 @@ module.exports.deleteTour = async (req, res) => {
   }
 };
 
+
+
+module.exports.getTour = async (req, res) => {
+  const { id } = req.params;
+  const user = req.user;
+  const userId = user.id;
+
+  try {
+    const tour = await prisma.tour.findUnique({
+      where: {
+        id: Number(id),
+      },
+      include: {
+        user: true, // Assuming the `tour` model has a relation field `user`
+      },
+    });
+
+    if (!tour) {
+      return res.status(404).json({ error: 'Tour not found' });
+    }
+
+    res.status(201).json({ tour: tour });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
