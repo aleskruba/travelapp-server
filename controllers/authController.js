@@ -641,3 +641,44 @@ module.exports.updatePassword = async (req, res, next) => {
     }
 };
 
+
+
+module.exports.deleteprofile = async (req, res, next) => {
+    const sessionUser = req.user;
+    const userId = sessionUser.id;
+
+    try {
+        const sessionId = req.cookies.sessionID;
+        if (!sessionId) {
+            return res.status(400).json({ error: 'No session ID found' });
+        }
+
+        // Update session data in Redis
+        const sessionData = await getAsync(`session:${sessionId}`);
+        if (!sessionData) {
+            return res.status(400).json({ error: 'Session not found' });
+        }
+        
+
+        // logout user
+        await delAsync(`session:${sessionId}`);
+
+        // Clear the cookie
+        res.clearCookie('sessionID', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+        });
+     
+         await prisma.user.delete({
+            where: { id: userId },
+        });
+    
+         return res.status(201).json({ message: "ok" });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
+

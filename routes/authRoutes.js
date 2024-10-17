@@ -17,6 +17,7 @@ router.post('/api/verifytoken', authController.verifyToken);
 router.put('/api/resetpassword', authController.resetPassword);
 router.put('/api/uploadprofileimage',verifySession,authController.uploadprofileimage);
 router.put('/api/updateprofile',verifySession,authController.updateprofile)
+router.delete('/api/deleteprofile',verifySession,authController.deleteprofile)
 router.put('/api/updatepassword',verifySession,authController.updatePassword)
 
 
