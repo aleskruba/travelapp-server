@@ -140,8 +140,6 @@ module.exports.postMessage = async (req, res) => {
     const user = req.user;
     const userId = user.id;
   
-    console.log('message:', message);
-    console.log('userId:', userId);
   
     try {
 
@@ -183,7 +181,7 @@ module.exports.postMessage = async (req, res) => {
     const user = req.user;
     const userId = user.id;
   
-  
+    console.log(id)
     try {
       const message = await prisma.reply.findUnique({
         where: {

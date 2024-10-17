@@ -15,6 +15,7 @@ const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
 const verifySession = async (req, res, next) => {
+
     try {
       const sessionId = req.cookies.sessionID;
   
@@ -32,7 +33,7 @@ const verifySession = async (req, res, next) => {
       // Parse session data
       const session = JSON.parse(sessionData);
       req.user = session;
-  
+
       next();
     } catch (error) {
       console.error('Error retrieving session:', error);

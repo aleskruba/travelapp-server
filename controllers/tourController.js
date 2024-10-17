@@ -23,11 +23,12 @@ function convertDate(monthYear) {
 
   const [month, year] = monthYear.split('-');
   const monthNumber = months[month.toLowerCase()];
+  console.log(month,year)
 
-  if (!monthNumber) {
-      throw new Error(`Invalid month name: ${month}`);
+
+  if (!monthNumber || isNaN(year) || year.length !== 4) {
+    return null;
   }
-
   return `${monthNumber}-${year}`;
 }
 
@@ -48,11 +49,18 @@ module.exports.getTours = async (req, res) => {
   let dateFilter = {};
   if (tourDates) {
     const convertedValue = convertDate(tourDates); // e.g., "11-2024"
+
+    if (!convertedValue) {
+      // If the date format is invalid, return a 400 Bad Request response
+      return res.status(400).json({ error: 'Invalid date format' });
+    }
     const [month, year] = convertedValue.split('-');
 
     // Handle year-end transition
     const nextMonth = parseInt(month) === 12 ? '01' : String(parseInt(month) + 1).padStart(2, '0');
     const nextYear = parseInt(month) === 12 ? parseInt(year) + 1 : year;
+
+
 
     dateFilter = {
       OR: [
