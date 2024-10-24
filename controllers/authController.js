@@ -198,13 +198,13 @@ module.exports.login_post = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ error: {email:email,password:password} });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ error: 'Invalid email or password' });
+            return res.status(401).json({ error: {email:email,password:password} });
         }
 
         const userData = {
@@ -562,6 +562,19 @@ module.exports.updateprofile = async (req, res, next) => {
     const { username, firstName, lastName, email } = req.body;
 
     try {
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex validation
+
+        if (
+            username.trim().length > 15 || username.trim().length < 4 ||
+            firstName.trim().length < 4 || firstName.trim().length > 15 ||
+            lastName.trim().length < 4 || lastName.trim().length > 15 ||
+            !emailRegex.test(email) // Check if email is valid
+        ) {
+            return res.status(400).json({error:'Backend error : chybné data' });
+        }
+
+
         // Update user profile in the database
         const updatedUser = await prisma.user.update({
             where: { id: userId },
@@ -593,7 +606,8 @@ module.exports.updateprofile = async (req, res, next) => {
           session.email = email;
         await setAsync(`session:${sessionId}`, JSON.stringify(session));
 
-        res.status(201).json({ updatedUser });
+        res.status(201).json({ updatedUser,
+                               message : 'Update proběhl úspěšně' });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Server error' });

@@ -133,16 +133,24 @@ module.exports.postMessage = async (req, res) => {
       res.status(500).json({ error: 'Server error' });
     }
   };
-
-
   module.exports.postReply = async (req, res) => {
-    const message  = req.body;
+    const message = req.body;
     const user = req.user;
     const userId = user.id;
   
-  
     try {
-
+      // Check if the message_id exists in the prisma.reply table
+      const existingMessage = await prisma.message.findUnique({
+        where: {
+          id: message.message_id,
+        },
+      });
+  
+      if (!existingMessage) {
+        console.log('Zpráva neexistuje nebo byla smazána')
+        return res.status(404).json({ error: 'Zpráva neexistuje nebo byla smazána' });
+      }
+  
       if (!message.message.trim().length) {
         return res.status(403).json({ error: 'Žádný text' });
       }
@@ -168,11 +176,10 @@ module.exports.postMessage = async (req, res) => {
   
     } catch (err) {
       console.error(err);
-      res.status(500).json({ error: 'Chyba server neodpovidá' });
+      res.status(500).json({ error: 'Chyba server neodpovídá' });
     }
   };
-
-
+  
 
   
 
@@ -214,7 +221,7 @@ module.exports.voteMessage = async (req, res) => {
   const data = req.body; // data.message_id and data.voteType
   const user = req.user;
   const userId = user.id;
-
+  console.log('data',data)
   try {
     // Check if a vote from this user for this message already exists
     const existingVote = await prisma.votes.findFirst({
