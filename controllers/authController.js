@@ -599,7 +599,7 @@ module.exports.updateprofile = async (req, res, next) => {
         }
         
         const session = JSON.parse(sessionData);
-        console.log('session',session)
+      //  console.log('session',session)
           session.username = username;
           session.firstName = firstName;
           session.lastName = lastName;
