@@ -198,7 +198,7 @@ module.exports.login_post = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: {email:email,password:password} });
+            return res.status(401).json({ error: {email:email,password:password},message:"Chybný email nebo heslo" });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
