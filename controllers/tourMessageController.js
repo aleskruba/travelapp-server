@@ -38,6 +38,7 @@ module.exports.getTourMessages = async (req, res) => {
         // Filter the replies based on the user ID and message type
         const filteredReplies = message.tourreply.map((reply) => {
           if (reply.messagetype === 1) {
+            
             // Decrypt the message if it's private
             try {
               reply.message = decrypt(reply.message); // Decrypt the message
@@ -49,6 +50,7 @@ module.exports.getTourMessages = async (req, res) => {
             if (reply.user_id === user.id || message.user.id == user.id) {
               return reply;
             } else {
+    
               // You can return null or a placeholder if the message shouldn't be shown
               return null;
             }
@@ -57,14 +59,13 @@ module.exports.getTourMessages = async (req, res) => {
             return reply;
           }
         }).filter((reply) => reply !== null); // Remove null replies
-        
         // Return the message with the filtered replies
         return {
           ...message,
           tourreply: filteredReplies
         };
       });
-      
+ // Verify reply filtering
       const totalPages = Math.ceil(totalMessages / limit);
       res.status(200).json({
           tourmessages,

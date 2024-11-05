@@ -102,7 +102,7 @@ module.exports.signup_post = async (req, res) => {
 
             res.cookie('sessionID', sessionId, {
                 httpOnly: true,
-                maxAge: 5 * 24 * 60 * 60 * 1000,
+                maxAge: 31 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'none'
             });
@@ -227,7 +227,7 @@ module.exports.login_post = async (req, res) => {
 
             res.cookie('sessionID', sessionId, {
                 httpOnly: true,
-                maxAge: 5 * 24 * 60 * 60 * 1000,
+                maxAge: 31 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'none'
             });
