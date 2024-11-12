@@ -18,6 +18,7 @@ const verifySession = async (req, res, next) => {
 
     try {
       const sessionId = req.cookies.sessionID;
+
   
       if (!sessionId) {
         return res.status(401).json({ error: 'No session found' });
@@ -33,6 +34,7 @@ const verifySession = async (req, res, next) => {
       // Parse session data
       const session = JSON.parse(sessionData);
       req.user = session;
+   
 
       next();
     } catch (error) {
@@ -98,5 +100,19 @@ async function verifyUser(req, res, next) {
     }
 }
 
+const isAdmin = (req, res, next) => {
+    // Ensure user is authenticated with verifySession
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized access' });
+    }
+  
+    // Check if user has isAdmin privileges
+    if (!req.user.isAdmin) {
+      return res.status(403).json({ error: 'Access denied: Admins only' });
+    }
+  
+    next(); // Proceed if the user is an admin
+  };
 
-module.exports = {verifySession,checkAlreadyLoggedIn,verifyUser};
+  
+module.exports = {verifySession,checkAlreadyLoggedIn,verifyUser,isAdmin};

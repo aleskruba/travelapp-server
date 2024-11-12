@@ -117,7 +117,7 @@ module.exports.postMessage = async (req, res) => {
         return res.status(404).json({ error: 'Message not found' });
       }
   
-      if (message.user_id !== userId) {
+      if (message.user_id !== userId && !user.isAdmin) {
         return res.status(403).json({ error: 'You are not authorized to delete this message' });
       }
   
@@ -200,9 +200,10 @@ module.exports.postMessage = async (req, res) => {
         return res.status(404).json({ error: 'Message not found' });
       }
   
-      if (message.user_id !== userId) {
+      if (message.user_id !== userId && !user.isAdmin) {
         return res.status(403).json({ error: 'You are not authorized to delete this message' });
       }
+      
   
       await prisma.reply.delete({
         where: {

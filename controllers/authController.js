@@ -23,7 +23,8 @@ module.exports.checkSession = (req, res, next) => {
         lastName: user.lastName,
         email: user.email,
         googleEmail: user.googleEmail,
-        image: user.image
+        image: user.image,
+        isAdmin: user.isAdmin
     };
 
 
@@ -190,7 +191,8 @@ module.exports.googleSignup_post = async (req, res) => {
 
 
 module.exports.login_post = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password,ipAddress } = req.body;
+
 
     try {
         const user = await prisma.user.findUnique({
@@ -198,13 +200,45 @@ module.exports.login_post = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(401).json({ error: {email:email,password:password},message:"Chybný email nebo heslo" });
+            // Log failed login attempt
+      /*       await prisma.loginLog.create({
+                data: {
+                    user: {
+                        connect: { id: 'wronguser'}  // Associate the existing user by user ID
+                    }, // User not found, so userId will be null
+                    ipAddress: ipAddress || 'unknown',
+                    timestamp: new Date(),
+                    status: 'FAILURE',
+                    failureReason: 'Invalid email'
+                }
+            }); */
+
+            return res.status(401).json({
+                error: { email: email, password: password },
+                message: "Chybný email nebo heslo"
+            });
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
-            return res.status(401).json({ error: {email:email,password:password} });
+            // Log failed login attempt
+            await prisma.loginLog.create({
+                data: {
+                    user: {
+                        connect: { id: user.id }  // Associate the existing user by user ID
+                    },
+                    ipAddress: ipAddress || 'unknown',
+                    timestamp: new Date(),
+                    status: 'FAILURE',
+                    failureReason: 'Incorrect password'
+                }
+            });
+
+            return res.status(401).json({
+                error: { email: email, password: password },
+                message: "Chybný email nebo heslo"
+            });
         }
 
         const userData = {
@@ -214,28 +248,41 @@ module.exports.login_post = async (req, res) => {
             lastName: user.lastName,
             email: user.email,
             googleEmail: user.googleEmail,
-            image: user.image
+            image: user.image,
+            isAdmin: user.isAdmin
         };
 
-   
         const sessionId = uuidv4();
 
         // Store the session ID in Redis with an expiration time
         await setAsync(`session:${sessionId}`, JSON.stringify(user), 'EX', 86400); // Expire in 1 day (86400 seconds)
 
-          //  res.cookie('sessionID', sessionId, { maxAge: 86400 * 1000, httpOnly: true });
+        // Log successful login attempt
+        await prisma.loginLog.create({
+            data: {
+                user: {
+                    connect: { id: user.id }  // Associate the existing user by user ID
+                },
+                ipAddress: ipAddress || 'unknown',  // Use the IP address or 'unknown'
+                timestamp: new Date(),  // Current timestamp
+                status: 'SUCCESS',  // Set login status
+                failureReason: null  // No failure reason for successful login
+            }
+        });
+        
 
-            res.cookie('sessionID', sessionId, {
-                httpOnly: true,
-                maxAge: 31 * 24 * 60 * 60 * 1000,
-                secure: true,
-                sameSite: 'none'
-            });
+        // Set the session cookie
+        res.cookie('sessionID', sessionId, {
+            httpOnly: true,
+            maxAge: 31 * 24 * 60 * 60 * 1000,
+            secure: true,
+            sameSite: 'none'
+        });
 
-            res.status(200).json({
-                message: 'Přihlášní proběhlo úspěšně',
-                user: userData
-            });
+        res.status(200).json({
+            message: 'Přihlášní proběhlo úspěšně',
+            user: userData
+        });
 
     } catch (err) {
         console.error('Error logging in user:', err);
@@ -566,13 +613,14 @@ module.exports.updateprofile = async (req, res, next) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex validation
 
         if (
-            username.trim().length > 15 || username.trim().length < 4 ||
-            firstName.trim().length < 4 || firstName.trim().length > 15 ||
-            lastName.trim().length < 4 || lastName.trim().length > 15 ||
+            (username && (username.trim().length > 15 || username.trim().length < 4)) ||
+            (firstName && (firstName.trim().length < 4 || firstName.trim().length > 15)) ||
+            (lastName && (lastName.trim().length < 4 || lastName.trim().length > 15)) ||
             !emailRegex.test(email) // Check if email is valid
         ) {
-            return res.status(400).json({error:'Backend error : chybné data' });
+            return res.status(400).json({ error: 'Backend error: chybné data' });
         }
+        
 
 
         // Update user profile in the database

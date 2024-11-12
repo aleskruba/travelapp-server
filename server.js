@@ -9,6 +9,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const vlogRoutes = require('./routes/vlogRoutes');
 const tourRoutes = require('./routes/tourRoutes');
 const tourMessageRoutes = require('./routes/tourMessageRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 dotenv.config();
 
@@ -26,7 +27,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(authRoutes,messageRoutes,vlogRoutes,tourRoutes,tourMessageRoutes);
+app.use(authRoutes,messageRoutes,vlogRoutes,tourRoutes,tourMessageRoutes,adminRoutes);
 
 
 

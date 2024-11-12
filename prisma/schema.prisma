@@ -24,6 +24,7 @@ model user {
   reset_token_hash       String?       @db.VarChar(64)
   reset_token_expires_at DateTime?     @db.DateTime(0)
   passwordUpdatedAt      DateTime?     @db.DateTime(0) 
+    isAdmin                Boolean       @default(false)
   message                message[]
   reply                  reply[]
   tour                   tour[]
@@ -32,6 +33,7 @@ model user {
   video                  video[]
   votes                  votes[]
   votesreply             votesreply[]
+  loginLogs             LoginLog[] // New relation to LoginLog
 }
 
 model message {
@@ -156,4 +158,16 @@ enum votes_vote_type {
 enum votesreply_vote_type {
   thumb_up
   thumb_down
+}
+
+model LoginLog {
+  id            Int       @id @default(autoincrement())
+  user          user      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user_id       Int
+  timestamp     DateTime  @default(now()) @db.Timestamp(0)
+  ipAddress     String?   @db.VarChar(45) // Supports both IPv4 and IPv6
+  status        String    @db.VarChar(20) // e.g., "SUCCESS" or "FAILURE"
+  failureReason String?   @db.VarChar(255) // Optional: only for failed attempts
+  
+  @@index([user_id, timestamp], map: "user_timestamp_idx")
 }
