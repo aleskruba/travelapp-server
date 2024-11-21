@@ -67,6 +67,8 @@ model reply {
 model tour {
   id             Int           @id @default(autoincrement())
   destination    String?       @db.VarChar(255)
+  destinationes  String?       @db.VarChar(255)
+  destinationen  String?       @db.VarChar(255)
   date           DateTime?     @default(now()) @db.Timestamp(0)
   tourdate       DateTime?     @db.Date
   tourdateEnd    DateTime?     @db.Date

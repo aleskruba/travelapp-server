@@ -111,6 +111,55 @@ module.exports.getTours = async (req, res) => {
       distinct: ['destination'],
     });
 
+  /*   const tours = await prisma.tour.findMany({
+      include: {
+        user: true,
+      },
+      where: {
+        AND: [
+          {
+            OR: [
+              {
+                destination: {
+                  contains: normalizedSearch,
+                },
+              },
+              {
+                destinationen: {
+                  contains: normalizedSearch,
+                },
+              },
+              {
+                destinationes: {
+                  contains: normalizedSearch,
+                },
+              },
+            ],
+          },
+          {
+            OR: countryArray.map((country) => ({
+              destinationes: {
+                contains: country,
+              },
+            })),
+          },
+          {
+            OR: tourTypeArray.map((type) => ({
+              tourtype: {
+                contains: type,
+              },
+            })),
+          },
+          dateFilter, // Add date filter here
+        ],
+      },
+      orderBy: {
+        id: 'desc',
+      },
+      skip: offset,
+      take: limit,
+    }); */
+    
     const tours = await prisma.tour.findMany({
       include: {
         user: true,
@@ -118,9 +167,23 @@ module.exports.getTours = async (req, res) => {
       where: {
         AND: [
           {
-            destination: {
-              contains: normalizedSearch,
-            },
+            OR: [
+              {
+                destination: {
+                  contains: normalizedSearch,
+                },
+              },
+              {
+                destinationen: {
+                  contains: normalizedSearch,
+                },
+              },
+              {
+                destinationes: {
+                  contains: normalizedSearch,
+                },
+              },
+            ],
           },
           {
             OR: countryArray.map((country) => ({
@@ -174,7 +237,7 @@ module.exports.getTours = async (req, res) => {
     });
 
     const totalPages = Math.ceil(totalTours / limit);
-
+/* console.log(tours) */
     res.status(200).json({
       tours,
       totalPages,
@@ -220,6 +283,7 @@ module.exports.postTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
+  console.log(data);
   
   try {
     const hasCompleted = !data.tour.destination || data.tour.tourtype.length === 0 || !data.tour.fellowtraveler || !data.tour.aboutme || !data.tour.tourdate || !data.tour.tourdateEnd;
@@ -240,6 +304,8 @@ module.exports.postTour = async (req, res) => {
     const newTour = await prisma.tour.create({
       data: {
         destination: data.tour.destination,
+        destinationen: data.destinationen,
+        destinationes: data.destinationes,
         tourdate,       // Date object
         tourdateEnd,    // Date object
         fellowtraveler: data.tour.fellowtraveler,
