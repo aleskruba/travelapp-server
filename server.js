@@ -27,6 +27,17 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(cookieParser());
+
+app.use((req, res, next) => {
+  try {
+    decodeURIComponent(req.path); // Validate URL encoding
+    next(); // Proceed if valid
+  } catch (error) {
+    console.error('Invalid URL:', req.path, error.message);
+    res.status(400).send('Bad Request: Invalid URL'); // Custom response
+  }
+});
+
 app.use(authRoutes,messageRoutes,vlogRoutes,tourRoutes,tourMessageRoutes,adminRoutes);
 
 

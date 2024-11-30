@@ -23,7 +23,7 @@ function convertDate(monthYear) {
 
   const [month, year] = monthYear.split('-');
   const monthNumber = months[month.toLowerCase()];
-  console.log(month,year)
+
 
 
   if (!monthNumber || isNaN(year) || year.length !== 4) {
@@ -41,7 +41,7 @@ module.exports.getTours = async (req, res) => {
   
   const search = req.query.search || '';
   const page = parseInt(req.query.page) || 1;
-  const limit = 8;
+  const limit = 10;
   const offset = (page - 1) * limit;
   
   const normalizedSearch = removeAccents(search).toLowerCase();
@@ -283,7 +283,7 @@ module.exports.postTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
-  console.log(data);
+
   
   try {
     const hasCompleted = !data.tour.destination || data.tour.tourtype.length === 0 || !data.tour.fellowtraveler || !data.tour.aboutme || !data.tour.tourdate || !data.tour.tourdateEnd;

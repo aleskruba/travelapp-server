@@ -62,8 +62,7 @@ module.exports.postMessage = async (req, res) => {
     const user = req.user;
     const userId = user.id;
   
-    console.log('message:', message);
-    console.log('userId:', userId);
+ 
   
     try {
 
@@ -188,7 +187,7 @@ module.exports.postMessage = async (req, res) => {
     const user = req.user;
     const userId = user.id;
   
-    console.log(id)
+ 
     try {
       const message = await prisma.reply.findUnique({
         where: {
@@ -222,7 +221,7 @@ module.exports.voteMessage = async (req, res) => {
   const data = req.body; // data.message_id and data.voteType
   const user = req.user;
   const userId = user.id;
-  console.log('data',data)
+ 
   try {
     // Check if a vote from this user for this message already exists
     const existingVote = await prisma.votes.findFirst({
