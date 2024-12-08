@@ -124,3 +124,27 @@ module.exports.getLoginData = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+module.exports.getRegistrationData = async (req, res) => { 
+  try {
+    // Get all users excluding admins
+    const users = await prisma.user.findMany({
+      where: {
+        isAdmin: false  // Filter to exclude users with isAdmin = true
+      }
+    });
+
+    // Calculate the total number of users excluding admins
+    const totalUser = users.length; // This gives the total number of users where isAdmin = false
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({ error: 'No users found' });
+    }
+
+    // Return the data in response
+    res.status(200).json({ totalUser, users });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+};

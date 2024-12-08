@@ -7,6 +7,7 @@ const router = Router();
 router.get('/api/admin/getusers',verifySession,isAdmin,adminController.getUsers);
 router.get('/api/admin/getuser/:id',verifySession,isAdmin,adminController.getUser);
 router.get('/api/admin/logindata',verifySession,isAdmin,adminController.getLoginData);
+router.get('/api/admin/registrationdata',verifySession,isAdmin,adminController.getRegistrationData);
 
 
 

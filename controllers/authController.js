@@ -195,24 +195,14 @@ module.exports.login_post = async (req, res) => {
 
 
     try {
+     
+
         const user = await prisma.user.findUnique({
             where: { email: email }
         });
 
+     
         if (!user) {
-            // Log failed login attempt
-      /*       await prisma.loginLog.create({
-                data: {
-                    user: {
-                        connect: { id: 'wronguser'}  // Associate the existing user by user ID
-                    }, // User not found, so userId will be null
-                    ipAddress: ipAddress || 'unknown',
-                    timestamp: new Date(),
-                    status: 'FAILURE',
-                    failureReason: 'Invalid email'
-                }
-            }); */
-
             return res.status(401).json({
                 error: { email: email, password: password },
                 message: "Chybný email nebo heslo"
