@@ -146,7 +146,6 @@ module.exports.signup_post = async (req, res) => {
                 httpOnly: true,
                 maxAge: 31 * 24 * 60 * 60 * 1000,
                 secure: true,
-                domain:  '.onrender.com',
                 sameSite: 'none'
             });
 
