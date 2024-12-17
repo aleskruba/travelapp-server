@@ -5,7 +5,8 @@ const { v4: uuidv4 } = require('uuid');
 const { promisify } = require('util');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const { redisClient } = require('../redis.js')
+const { redisClient } = require('../redis.js');
+const { itxClientDenyList } = require('@prisma/client/runtime/library');
 
 
 const setAsync = promisify(redisClient.set).bind(redisClient);
@@ -13,10 +14,43 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-module.exports.getTest = (req, res, next) => {
 
+module.exports.getTest = async (req, res) => {
+    const sessionId = uuidv4();
 
-}
+    try {
+        // Store session in Redis
+        await setAsync(`session:${sessionId}`, JSON.stringify({ test: 'test' }), 'EX', 10); // 10 seconds expiry
+
+        // Set the test cookie
+        res.cookie('sessionTest', sessionId, {
+            httpOnly: true,
+            maxAge: 5000, // 5 seconds
+            secure: true,
+            sameSite: 'none',
+        });
+
+        // Delete the Redis session
+        await delAsync(`session:${sessionId}`);
+
+        // Clear the cookie
+        res.clearCookie('sessionTest', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+        });
+
+        // If everything succeeded, cookies are working
+        res.status(200).json({ message: 'Cookies work fine' });
+    } catch (err) {
+        console.error('Error in cookie test:', err);
+
+        // Cookies might be blocked or Redis failed
+        res.status(500).json({
+            error: 'Cookies were not stored. Please enable third-party cookies.',
+        });
+    }
+};
 
 
 module.exports.checkSession = (req, res, next) => {
