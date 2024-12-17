@@ -13,29 +13,10 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-function checkCookiesBlocked() {
-    // Try to set a test cookie
-    document.cookie = "testCookie=true; SameSite=None; Secure; path=/; max-age=3600";
-    
-    // Check if the cookie was successfully set
-    const cookiesEnabled = document.cookie.indexOf("testCookie=true") !== -1;
 
-    // If cookies are blocked, show a warning and return false
-    if (!cookiesEnabled) {
-        alert("It seems that third-party cookies are blocked. Please enable them in your browser settings to log in.");
-        return false;
-    }
-
-    return true;
-}
 
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
-
-    if (!checkCookiesBlocked()) {
-        return; // Don't allow login if cookies are blocked
-    }
-
 
     try {
       const userData = {
@@ -86,10 +67,6 @@ module.exports.getUsers = async (req, res) => {
 module.exports.signup_post = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
  
-    if (!checkCookiesBlocked()) {
-        return; // Don't allow login if cookies are blocked
-    }
-
 
     try {
         const existingUser = await prisma.user.findUnique({
@@ -158,11 +135,6 @@ module.exports.signup_post = async (req, res) => {
 module.exports.googleSignup_post = async (req, res) => {
     const { email, name, profilePicture } = req.body;
 
-    if (!checkCookiesBlocked()) {
-        return; // Don't allow login if cookies are blocked
-    }
-
-
     try {
         const existingUser = await prisma.user.findUnique({
             where: { email: email }
@@ -224,9 +196,6 @@ module.exports.googleSignup_post = async (req, res) => {
 module.exports.login_post = async (req, res) => {
     const { email, password,ipAddress } = req.body;
 
-    if (!checkCookiesBlocked()) {
-        return; // Don't allow login if cookies are blocked
-    }
 
     try {
      
@@ -320,11 +289,6 @@ module.exports.login_post = async (req, res) => {
 
 module.exports.googleLogin_post = async (req, res) => {
     const { email } = req.body;
-
-    if (!checkCookiesBlocked()) {
-        return; // Don't allow login if cookies are blocked
-    }
-
 
     try {
         const user = await prisma.user.findUnique({
