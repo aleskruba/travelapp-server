@@ -15,20 +15,40 @@ const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
 // authController.js
-module.exports.getTest = (req, res) => {
+module.exports.getTest = async (req, res) => {
     try {
-        // Check if the session cookie is set (for example, check 'sessionID' cookie)
-        if (req.cookies && req.cookies.sessionID) {
+        // Check if the sessionID cookie exists
+        const sessionID = req.cookies?.sessionID;
+
+        if (!sessionID) {
+            // If the sessionID cookie is not present, create one and store it in Redis
+            const newSessionID = uuidv4();
+            res.cookie('sessionID', newSessionID, {
+                httpOnly: true, // Prevent access from client-side JavaScript
+                secure: false,  // Set to true if using HTTPS
+                sameSite: 'None', // Required for third-party cookies
+                maxAge: 60 * 1000 // 1 minute expiration for testing
+            });
+
+            // Store the session ID in Redis
+            await setAsync(newSessionID, 'active', 'EX', 60); // Expire in 1 minute
+
+            return res.status(200).json({ message: 'Test cookie set. Please refresh to verify.' });
+        }
+
+        // If the sessionID cookie exists, validate it with Redis
+        const sessionStatus = await getAsync(sessionID);
+
+        if (sessionStatus === 'active') {
             return res.status(200).json({ message: 'Cookies are enabled.' });
         } else {
-            return res.status(400).json({ error: 'Cookies are blocked or not set.' });
+            return res.status(400).json({ error: 'Invalid or expired session.' });
         }
     } catch (err) {
         console.error('Error in getTest route:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 };
-
 
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
