@@ -305,6 +305,7 @@ module.exports.googleLogin_post = async (req, res) => {
     const { email } = req.body;
 
     if (!checkCookiesBlocked()) {
+        alert('vypni si prossim cookies')
         return; // Don't allow login if cookies are blocked
     }
 
