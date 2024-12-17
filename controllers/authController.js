@@ -18,25 +18,25 @@ module.exports.getTest = async (req, res) => {
 
     try {
         // Store session in Redis
-        await setAsync(`session:${sessionId}`, JSON.stringify({ test: 'test' }), 'EX', 10); // 10 seconds expiry
+        await setAsync(`session:${sessionId}`, JSON.stringify({ test: 'test' }), 'EX', 86400); // 10 seconds expiry
 
         // Set the test cookie
         res.cookie('sessionTest', sessionId, {
             httpOnly: true,
-            maxAge: 5000, // 5 seconds
+            maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'none',
         });
 
         // Delete the Redis session
-        await delAsync(`session:${sessionId}`);
+     /*    await delAsync(`session:${sessionId}`);
 
         // Clear the cookie
         res.clearCookie('sessionTest', {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-        });
+        }); */
 
         // If everything succeeded, cookies are working
         res.status(200).json({ message: 'Cookies work fine' });
