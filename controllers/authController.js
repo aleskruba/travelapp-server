@@ -5,14 +5,12 @@ const { v4: uuidv4 } = require('uuid');
 const { promisify } = require('util');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-const { redisClient } = require('../redis.js');
-const { itxClientDenyList } = require('@prisma/client/runtime/library');
+const { redisClient } = require('../redis.js')
 
 
 const setAsync = promisify(redisClient.set).bind(redisClient);
 const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
-
 
 
 module.exports.getTest = async (req, res) => {
@@ -51,7 +49,6 @@ module.exports.getTest = async (req, res) => {
         });
     }
 };
-
 
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
@@ -307,8 +304,7 @@ module.exports.login_post = async (req, res) => {
             httpOnly: true,
             maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: true,
-            sameSite: 'none',
-         
+            sameSite: 'none'
         });
 
         res.status(200).json({
@@ -358,8 +354,7 @@ module.exports.googleLogin_post = async (req, res) => {
                 httpOnly: true,
                 maxAge: 5 * 24 * 60 * 60 * 1000,
                 secure: true,
-                sameSite: 'none',
-      
+                sameSite: 'none'
             });
 
             res.status(200).json({
