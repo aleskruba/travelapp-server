@@ -23,6 +23,8 @@ app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 const corsOptions = {
   origin: [ 'http://localhost:3000','https://travelapp-itpa.onrender.com'],
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST'],
   secure: true,
   sameSite: 'none',
   domain:  '.onrender.com' 

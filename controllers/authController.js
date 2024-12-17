@@ -14,6 +14,21 @@ const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
 
+// authController.js
+module.exports.getTest = (req, res) => {
+    try {
+        // Check if the session cookie is set (for example, check 'sessionID' cookie)
+        if (req.cookies && req.cookies.sessionID) {
+            return res.status(200).json({ message: 'Cookies are enabled.' });
+        } else {
+            return res.status(400).json({ error: 'Cookies are blocked or not set.' });
+        }
+    } catch (err) {
+        console.error('Error in getTest route:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
