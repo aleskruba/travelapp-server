@@ -32,6 +32,11 @@ function checkCookiesBlocked() {
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
 
+    if (!checkCookiesBlocked()) {
+        return; // Don't allow login if cookies are blocked
+    }
+
+
     try {
       const userData = {
         id: user.id,
@@ -81,6 +86,10 @@ module.exports.getUsers = async (req, res) => {
 module.exports.signup_post = async (req, res) => {
     const { email, password, confirmPassword } = req.body;
  
+    if (!checkCookiesBlocked()) {
+        return; // Don't allow login if cookies are blocked
+    }
+
 
     try {
         const existingUser = await prisma.user.findUnique({
@@ -149,6 +158,11 @@ module.exports.signup_post = async (req, res) => {
 module.exports.googleSignup_post = async (req, res) => {
     const { email, name, profilePicture } = req.body;
 
+    if (!checkCookiesBlocked()) {
+        return; // Don't allow login if cookies are blocked
+    }
+
+
     try {
         const existingUser = await prisma.user.findUnique({
             where: { email: email }
@@ -210,6 +224,9 @@ module.exports.googleSignup_post = async (req, res) => {
 module.exports.login_post = async (req, res) => {
     const { email, password,ipAddress } = req.body;
 
+    if (!checkCookiesBlocked()) {
+        return; // Don't allow login if cookies are blocked
+    }
 
     try {
      
@@ -305,7 +322,6 @@ module.exports.googleLogin_post = async (req, res) => {
     const { email } = req.body;
 
     if (!checkCookiesBlocked()) {
-        alert('vypni si prossim cookies')
         return; // Don't allow login if cookies are blocked
     }
 
