@@ -275,7 +275,7 @@ module.exports.login_post = async (req, res) => {
             maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'none',
-            domain:  '.onrender.com',
+         
         });
 
         res.status(200).json({
@@ -326,7 +326,7 @@ module.exports.googleLogin_post = async (req, res) => {
                 maxAge: 5 * 24 * 60 * 60 * 1000,
                 secure: true,
                 sameSite: 'none',
-                domain:  '.onrender.com',
+      
             });
 
             res.status(200).json({
