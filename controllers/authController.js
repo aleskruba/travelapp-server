@@ -12,6 +12,13 @@ const setAsync = promisify(redisClient.set).bind(redisClient);
 const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
+
+module.exports.getTest = (req, res, next) => {
+
+
+}
+
+
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
 
@@ -105,6 +112,7 @@ module.exports.signup_post = async (req, res) => {
                 httpOnly: true,
                 maxAge: 31 * 24 * 60 * 60 * 1000,
                 secure: true,
+                domain:  '.onrender.com',
                 sameSite: 'none'
             });
 
@@ -266,7 +274,8 @@ module.exports.login_post = async (req, res) => {
             httpOnly: true,
             maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: true,
-            sameSite: 'none'
+            sameSite: 'none',
+            domain:  '.onrender.com',
         });
 
         res.status(200).json({
@@ -316,7 +325,8 @@ module.exports.googleLogin_post = async (req, res) => {
                 httpOnly: true,
                 maxAge: 5 * 24 * 60 * 60 * 1000,
                 secure: true,
-                sameSite: 'none'
+                sameSite: 'none',
+                domain:  '.onrender.com',
             });
 
             res.status(200).json({
