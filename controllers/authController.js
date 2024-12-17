@@ -22,7 +22,6 @@ module.exports.getTest = async (req, res) => {
 
         // Set the test cookie
         res.cookie('sessionTest', sessionId, {
-            httpOnly: true,
             maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: true,
             sameSite: 'none',
