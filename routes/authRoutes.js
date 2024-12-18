@@ -7,8 +7,8 @@ const router = Router();
 
 router.get('/api/getusers',authController.getUsers);
 router.get('/api/checksession',verifySession, authController.checkSession);
-router.get('/api/test',authController.test);
-
+router.get('/api/setcookietest',authController.setCookieTest);
+router.get('/api/getcookietest',authController.getCookieTest);
 router.post('/api/signup', authController.signup_post);
 router.post('/api/googlesignup', authController.googleSignup_post);
 router.post('/api/login',checkAlreadyLoggedIn, authController.login_post);
