@@ -13,47 +13,56 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-module.exports.test = async (req, res, next) => {
-    try {
-        const sessionId = req.cookies.sessionTest; // Check if the test cookie already exists
+const { v4: uuidv4 } = require('uuid'); // For generating unique session IDs
 
-        if (!sessionId) {
-            // Set a new test cookie if not present
-            const newSessionId = uuidv4();
-            await setAsync(`session:${newSessionId}`, JSON.stringify({ test: 'test' }), 'EX', 86400); // Optional Redis usage
+module.exports.test = async (req, res) => {
+  try {
+    const sessionId = req.cookies.sessionTest; // Check if the test cookie exists
 
-            res.cookie('sessionTest', newSessionId, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
-                maxAge: 10 * 1000, // 10 seconds for testing
-            });
+    if (!sessionId) {
+      // Set a new test cookie
+      const newSessionId = uuidv4();
 
-            console.log('New sessionTest cookie set');
-            
-            res.status(200).json({
-                message: 'New sessionTest cookie set',
-           
-            });
-        } else {
-            console.log('SessionTest cookie exists');
-            res.status(200).json({
-                message: 'SessionTest cookie exists',
-           
-            });
-        }
+      res.cookie('sessionTest', newSessionId, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 10 * 1000, // 10 seconds for testing
+      });
 
-        // Pass the request to the next middleware or route handler
-        next();
-    } catch (err) {
-        console.error('Error in test cookie middleware:', err);
-
-        // Respond with an error if something goes wrong
-        res.status(500).json({
-            error: 'Error validating test cookies. Please try again.',
+      // Immediately try to read the cookie again
+      if (req.cookies.sessionTest) {
+        // Cookie successfully set and retrieved
+        return res.status(200).json({
+          message: 'Cookies are working properly.',
+          status: 'success',
         });
+      } else {
+        // Browser blocked the cookie
+        return res.status(200).json({
+          message: 'Third-party cookies are blocked in this browser.',
+          status: 'blocked',
+        });
+      }
+    } else {
+      // Cookie is already present; cookies are working
+      return res.status(200).json({
+        message: 'Cookies are working properly.',
+        status: 'success',
+      });
     }
+  } catch (err) {
+    console.error('Error in test cookie middleware:', err);
+
+    // Respond with an error if something goes wrong
+    res.status(500).json({
+      error: 'Error validating test cookies. Please try again.',
+      status: 'error',
+    });
+  }
 };
+
+
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
 
