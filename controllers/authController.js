@@ -302,7 +302,7 @@ module.exports.login_post = async (req, res) => {
         res.cookie('sessionID', sessionId, {
             httpOnly: true,
             secure: true,
-            /* sameSite: 'none', */
+            sameSite: 'none',
             maxAge: 31 * 24 * 60 * 60 * 1000,
         });
 
