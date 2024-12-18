@@ -4,7 +4,7 @@ const { verifySession,checkAlreadyLoggedIn,verifyUser} = require('../middleware/
 
 const router = Router();
 
-router.get('/api/test',authController.getTest);
+router.get('/api/test',authController.testCookieMiddleware);
 
 router.get('/api/getusers',authController.getUsers);
 router.get('/api/checksession',verifySession, authController.checkSession);

@@ -13,42 +13,38 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-module.exports.getTest = async (req, res) => {
-    const sessionId = uuidv4();
-
+const testCookieMiddleware = async (req, res, next) => {
     try {
-        // Store session in Redis
-        await setAsync(`session:${sessionId}`, JSON.stringify({ test: 'test' }), 'EX', 86400); // 10 seconds expiry
+        const sessionId = req.cookies.sessionTest; // Check if the test cookie already exists
 
-        // Set the test cookie
-        res.cookie('sessionTest', sessionId, {
-            maxAge: 31 * 24 * 60 * 60 * 1000,
-            secure: true,
-            sameSite: 'none',
-        });
+        if (!sessionId) {
+            // Set a new test cookie if not present
+            const newSessionId = uuidv4();
+            await setAsync(`session:${newSessionId}`, JSON.stringify({ test: 'test' }), 'EX', 86400); // Optional Redis usage
 
-        // Delete the Redis session
-     /*    await delAsync(`session:${sessionId}`);
+            res.cookie('sessionTest', newSessionId, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                maxAge: 10 * 1000, // 10 seconds for testing
+            });
 
-        // Clear the cookie
-        res.clearCookie('sessionTest', {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-        }); */
+            console.log('New sessionTest cookie set');
+        } else {
+            console.log('SessionTest cookie exists');
+        }
 
-        // If everything succeeded, cookies are working
-        res.status(200).json({ message: 'Cookies work fine' });
+        // Pass the request to the next middleware or route handler
+        next();
     } catch (err) {
-        console.error('Error in cookie test:', err);
+        console.error('Error in test cookie middleware:', err);
 
-        // Cookies might be blocked or Redis failed
+        // Respond with an error if something goes wrong
         res.status(500).json({
-            error: 'Cookies were not stored. Please enable third-party cookies.',
+            error: 'Error validating test cookies. Please try again.',
         });
     }
 };
-
 module.exports.checkSession = (req, res, next) => {
     const user = req.user;
 
