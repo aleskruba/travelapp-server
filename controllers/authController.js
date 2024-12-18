@@ -13,7 +13,7 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-const testCookieMiddleware = async (req, res, next) => {
+module.exports.testCookie = async (req, res, next) => {
     try {
         const sessionId = req.cookies.sessionTest; // Check if the test cookie already exists
 
