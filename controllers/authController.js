@@ -13,7 +13,7 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-module.exports.testCookie = async (req, res, next) => {
+module.exports.test = async (req, res, next) => {
     try {
         const sessionId = req.cookies.sessionTest; // Check if the test cookie already exists
 
@@ -30,8 +30,17 @@ module.exports.testCookie = async (req, res, next) => {
             });
 
             console.log('New sessionTest cookie set');
+            
+            res.status(200).json({
+                message: 'New sessionTest cookie set',
+           
+            });
         } else {
             console.log('SessionTest cookie exists');
+            res.status(200).json({
+                message: 'SessionTest cookie exists',
+           
+            });
         }
 
         // Pass the request to the next middleware or route handler

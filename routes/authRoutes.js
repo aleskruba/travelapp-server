@@ -4,10 +4,10 @@ const { verifySession,checkAlreadyLoggedIn,verifyUser} = require('../middleware/
 
 const router = Router();
 
-router.get('/api/cookietest',authController.testCookie);
 
 router.get('/api/getusers',authController.getUsers);
 router.get('/api/checksession',verifySession, authController.checkSession);
+router.get('/api/test',authController.test);
 
 router.post('/api/signup', authController.signup_post);
 router.post('/api/googlesignup', authController.googleSignup_post);
