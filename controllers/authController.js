@@ -13,7 +13,6 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
-const { v4: uuidv4 } = require('uuid'); // For generating unique session IDs
 
 module.exports.test = async (req, res) => {
   try {
