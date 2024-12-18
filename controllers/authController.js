@@ -301,9 +301,9 @@ module.exports.login_post = async (req, res) => {
         // Set the session cookie
         res.cookie('sessionID', sessionId, {
             httpOnly: true,
-            maxAge: 31 * 24 * 60 * 60 * 1000,
             secure: true,
-            sameSite: 'None'
+            /* sameSite: 'none', */
+            maxAge: 31 * 24 * 60 * 60 * 1000,
         });
 
         res.status(200).json({
