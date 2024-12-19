@@ -342,7 +342,7 @@ module.exports.login_post = async (req, res) => {
 
 
 module.exports.googleLogin_post = async (req, res) => {
-    const { email } = req.body;
+    const { email,ipAddress } = req.body;
 
     try {
         const user = await prisma.user.findUnique({
@@ -368,6 +368,18 @@ module.exports.googleLogin_post = async (req, res) => {
 
         // Store the session ID in Redis with an expiration time
         await setAsync(`session:${sessionId}`, JSON.stringify(user), 'EX', 86400); // Expire in 1 day (86400 seconds)
+
+        await prisma.loginLog.create({
+            data: {
+                user: {
+                    connect: { id: user.id }  // Associate the existing user by user ID
+                },
+                ipAddress: ipAddress || 'unknown',  // Use the IP address or 'unknown'
+                timestamp: new Date(),  // Current timestamp
+                status: 'SUCCESS',  // Set login status
+                failureReason: null  // No failure reason for successful login
+            }
+        });
 
             res.cookie('sessionID', sessionId, {
                 httpOnly: true,
