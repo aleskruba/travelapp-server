@@ -672,9 +672,9 @@ module.exports.updateprofile = async (req, res, next) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Simple email regex validation
 
         if (
-            (username && (username.trim().length > 15 || username.trim().length < 4)) ||
-            (firstName && (firstName.trim().length < 4 || firstName.trim().length > 15)) ||
-            (lastName && (lastName.trim().length < 4 || lastName.trim().length > 15)) ||
+            (username && (username.trim().length > 15 || username.trim().length < 1)) ||
+            (firstName && (firstName.trim().length < 1 || firstName.trim().length > 15)) ||
+            (lastName && (lastName.trim().length < 1 || lastName.trim().length > 15)) ||
             !emailRegex.test(email) // Check if email is valid
         ) {
             return res.status(400).json({ error: 'Backend error: chybné data' });
