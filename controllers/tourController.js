@@ -283,18 +283,34 @@ module.exports.postTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
+  console.log(data);
 
-  
   try {
-    const hasCompleted = !data.tour.destination || data.tour.tourtype.length === 0 || !data.tour.fellowtraveler || !data.tour.aboutme || !data.tour.tourdate || !data.tour.tourdateEnd;
+    const hasCompleted =
+      !data.tour.destination ||
+      data.tour.tourtype.length === 0 ||
+      !data.tour.fellowtraveler ||
+      !data.tour.aboutme ||
+      !data.tour.tourdate ||
+      !data.tour.tourdateEnd;
 
     if (hasCompleted) {
       return res.status(403).json({ error: 'Nejsou vyplňena všechna pole' });
     }
 
-    // Convert the tourdate and tourdateEnd to 'YYYY-MM-DD' format
-    const formattedTourdate = new Date(data.tour.tourdate).toISOString().slice(0, 10); // '2024-08-31'
-    const formattedTourdateEnd = new Date(data.tour.tourdateEnd).toISOString().slice(0, 10); // '2024-08-31'
+    // Adjust dates by adding 1 hour
+    const addOneHour = (dateString) => {
+      const date = new Date(dateString);
+      date.setHours(date.getHours() + 1); // Add 1 hour
+      return date;
+    };
+
+    const adjustedTourdate = addOneHour(data.tour.tourdate);
+    const adjustedTourdateEnd = addOneHour(data.tour.tourdateEnd);
+
+    // Format the dates to 'YYYY-MM-DD'
+    const formattedTourdate = adjustedTourdate.toISOString().slice(0, 10);
+    const formattedTourdateEnd = adjustedTourdateEnd.toISOString().slice(0, 10);
 
     // Convert back to valid Date object
     const tourdate = new Date(`${formattedTourdate}T00:00:00.000Z`);
@@ -316,7 +332,6 @@ module.exports.postTour = async (req, res) => {
     });
 
     res.status(201).json({ message: newTour });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Chyba server neodpovidá' });
@@ -329,6 +344,7 @@ module.exports.updateTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
+  console.log(data);
   try {
     // Find the existing tour by its ID
     const existingTour = await prisma.tour.findUnique({
@@ -424,6 +440,7 @@ module.exports.getTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
+
   try {
     const tour = await prisma.tour.findUnique({
       where: {
@@ -437,6 +454,8 @@ module.exports.getTour = async (req, res) => {
     if (!tour) {
       return res.status(404).json({ error: 'Tour not found' });
     }
+
+ /*    console.log(tour) */
 
     res.status(201).json({ tour: tour });
   } catch (err) {
