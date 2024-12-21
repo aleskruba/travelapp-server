@@ -283,8 +283,7 @@ module.exports.postTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
-  console.log(data);
-
+  
   try {
     const hasCompleted =
       !data.tour.destination ||
@@ -344,7 +343,7 @@ module.exports.updateTour = async (req, res) => {
   const user = req.user;
   const userId = user.id;
 
-  console.log(data);
+
   try {
     // Find the existing tour by its ID
     const existingTour = await prisma.tour.findUnique({

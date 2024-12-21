@@ -13,7 +13,22 @@ const delAsync = promisify(redisClient.del).bind(redisClient);
 const getAsync = promisify(redisClient.get).bind(redisClient);
 
 
+module.exports.getServerTest = (req, res) => {
 
+    try {
+        return res.status(200).json({
+            message: 'Server is On',
+            status: 'success',
+          });
+
+    }catch(err) {
+        console.log(err);
+        res.status(500).json({
+            error: 'Server Error.',
+          });
+    }
+
+}
 
 module.exports.setCookieTest = (req, res) => {
   try {
